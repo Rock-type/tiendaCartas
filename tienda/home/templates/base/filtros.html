@@ -1,0 +1,168 @@
+{% extends 'base/barra.html'%}
+
+{% block contenido%}
+<div class="container-fluid d-flex align-items-center p-2 ">
+    <div class="d-flex align-items-center ms-3">
+        <p class="barraResultado fw-bold mb-0 ms-2">{{totalBusqueda}} resultados para "{{buscar}}"</p>
+    </div>
+    <div class="d-flex ms-auto align-items-center">
+        <p class="barraResultado fw-bold mb-0 me-2">Ordenar</p>
+        <select class="form-select barraResultado" id="exampleSelect">
+            <option class="text-dark" value="1" {% if orden == '1' %}selected{% endif %}>Alfabéticamente</option>
+            <option class="text-dark" value="2" {% if orden == '2' %}selected{% endif %}>Precio (Mayor a Menor)</option>
+            <option class="text-dark" value="3" {% if orden == '3' %}selected{% endif %}>Precio (Menor a Mayor)</option>
+        </select>
+        
+    </div>
+</div>
+
+
+
+<div class="container-fluid py-3 fondoContenido">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 py-2">
+            <div class="d-flex flex-column bg-white border rounded-3">
+                <div class="bg-white p-3 border-bottom border-1">
+                    <p class="mb-0 text-dark fw-bold">Filtros:</p>
+                </div>
+                <div class="bg-white p-3 border-bottom border-1">
+                    <p class="mb-0 text-dark fw-bold">Cajas:</p>
+                </div>
+                {% if cajas_frecuencia %}
+                <form method="GET" action="{% url 'busqueda' %}">
+                    <input type="hidden" name="buscar" value="{{ buscar }}">
+                    <input type="hidden" name="orden" value="{{ orden }}">
+                    {% for caja, cantidad in cajas_frecuencia.items %}
+                    <div class="bg-white px-3 py-1 d-flex align-items-center">
+                        <div class="form-check me-1">
+                            <input class="form-check-input" type="checkbox" name="cajas" value="{{ caja }}" id="flexCheckDefault{{ forloop.counter }}"
+                                {% if caja in cajas_seleccionadas %}checked{% endif %} onchange="this.form.submit()">
+                        </div>
+                        <p class="mb-0 text-dark textoFiltro fw-bold">{{ caja }}</p>
+                        <p class="mb-0 text-dark textoCartaContenido1 fw-bold ms-2"> ({{ cantidad }})</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="bg-white px-3 py-1 d-flex align-items-center">
+                    <p class="mb-0 text-dark textoFiltro fw-bold mt-2">No resultados</p>
+                </div>
+                {% endif %}
+                <div class="bg-white p-3 border-bottom border-1">
+                    <p class="mb-0 text-dark fw-bold">TCG:</p>
+                </div>
+                {% if tcg_frecuencia %}
+                {% for tcg, cantidad in tcg_frecuencia.items %}
+                <div class="bg-white px-3 py-1 d-flex align-items-center">
+                    <div class="form-check me-1">
+                        <input class="form-check-input" type="checkbox" name="tcg" value="{{ tcg }}" id="flexCheckDefault{{ forloop.counter }}"
+                            {% if tcg in tcg_seleccionados %}checked{% endif %} onchange="this.form.submit()">
+                    </div>
+                    <p class="mb-0 text-dark textoFiltro fw-bold">{{ tcg }}</p>
+                    <p class="mb-0 text-dark textoCartaContenido1 fw-bold ms-2"> ({{ cantidad }})</p>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="bg-white px-3 py-1 d-flex align-items-center">
+                    <p class="mb-0 text-dark textoFiltro fw-bold mt-2">No resultados</p>
+                </div>
+                {% endif %}
+                <div class="bg-white p-3 border-bottom border-1">
+                    <p class="mb-0 text-dark fw-bold">Rareza:</p>
+                </div>
+                {% if tcg_seleccionados %}
+                {% if rarezas %}
+                {% for rareza, cantidad in rarezas.items %}
+                <div class="bg-white px-3 py-1 d-flex align-items-center">
+                    <div class="form-check me-1">
+                        <input class="form-check-input" type="checkbox" name="rarezas" value="{{ rareza }}" id="flexCheckDefault{{ forloop.counter }}"
+                            {% if rareza in rarezas_seleccionadas %}checked{% endif %} onchange="this.form.submit()">
+                    </div>
+                    <p class="mb-0 text-dark textoFiltro fw-bold">{{ rareza }}</p>
+                    <p class="mb-0 text-dark textoCartaContenido1 fw-bold ms-2"> ({{ cantidad }})</p>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="bg-white px-3 py-1 d-flex align-items-center">
+                    <p class="mb-0 text-dark textoFiltro fw-bold mt-2">No resultados</p>
+                </div>
+                {% endif %}
+                {% endif %}
+                </form>
+            </div>
+        </div>
+        <!-- Main Content -->
+        {% block busqueda %}
+        {% endblock %}
+    </div>
+</div>
+
+<script>
+    document.getElementById("exampleSelect").addEventListener("change", function() {
+        var selectedValue = this.value;
+        var url = new URL(window.location.href);
+        url.searchParams.set('orden', selectedValue);
+        var buscar = '{{ buscar }}';
+        if (buscar) {
+            url.searchParams.set('buscar', buscar);
+        }
+        window.location.href = url.toString();
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const input = document.getElementById('cantidad');
+        const max = parseInt(input.getAttribute('max'), 10);
+
+        input.addEventListener('input', function() {
+            let value = parseInt(input.value, 10);
+
+            if (isNaN(value) || value < 1) {
+                input.value = 1;
+            } else if (value > max) {
+                input.value = max;
+            }
+        });
+    });
+
+    function agregarAlCarrito(event, element) {
+    event.preventDefault(); // Prevenir la navegación por defecto del navegador
+    var cartaId = element.getAttribute('data-carta');
+    var cajaId = element.getAttribute('data-caja');
+    var rareza = element.getAttribute('data-rareza');
+    var tcg = element.getAttribute('data-tcg');
+    var cantidadInputId = 'cantidad-' + cartaId + cajaId + tcg;
+    var cantidad = document.getElementById(cantidadInputId).value;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', `/agregarCarro/?carta=${encodeURIComponent(cartaId)}&cantidad=${encodeURIComponent(cantidad)}&caja=${encodeURIComponent(cajaId)}&rareza=${encodeURIComponent(rareza)}&tcg=${encodeURIComponent(tcg)}`, true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            var response = JSON.parse(xhr.responseText);
+            console.log(response.message); // Verifica la respuesta en la consola
+            mostrarMensaje(response.message, response.status === 'error' ? 'error' : 'success'); // Mostrar el mensaje con el estilo adecuado
+        }
+    };
+    xhr.send();
+}
+
+function mostrarMensaje(mensaje, tipo) {
+    var divMensaje = document.getElementById('mensaje-carrito');
+    divMensaje.innerText = mensaje;
+    
+    // Aplicar estilo según el tipo de mensaje
+    if (tipo === 'error') {
+        divMensaje.style.backgroundColor = '#dc3545'; // Rojo para errores
+    } else {
+        divMensaje.style.backgroundColor = '#28a745'; // Verde para éxitos
+    }
+    
+    divMensaje.classList.add('show');
+    
+    setTimeout(function() {
+        divMensaje.classList.remove('show');
+    }, 3000); // El mensaje desaparecerá después de 3 segundos
+}
+</script>
+
+
+{% endblock %}

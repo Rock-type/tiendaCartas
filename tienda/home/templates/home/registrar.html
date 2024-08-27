@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700|Open+Sans:400,300,600">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', helvetica, arial, sans-serif;
+            background: url('http://farm8.staticflickr.com/7064/6858179818_5d652f531c_h.jpg') no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+        }
+
+        .log-form {
+            width: 40%;
+            min-width: 320px;
+            max-width: 475px;
+            background: #fff;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, .25);
+        }
+
+        @media (max-width: 40em) {
+            .log-form {
+                width: 95%;
+                position: relative;
+                margin: 2.5% auto 0 auto;
+                left: 0%;
+                transform: translate(0%, 0%);
+            }
+        }
+
+        .log-form form {
+            display: block;
+            width: 100%;
+            padding: 2em;
+        }
+
+        .log-form h2 {
+            width: 100%;
+            color: #8a8a8a;
+            font-family: 'Open Sans Condensed';
+            font-size: 1.35em;
+            display: block;
+            background: #2a2a2a;
+            text-transform: uppercase;
+            padding: .75em 1em .75em 1.5em;
+            box-shadow: inset 0px 1px 1px rgba(255, 255, 255, 0.05);
+            border: 1px solid #262626;
+            margin: 0;
+            font-weight: 200;
+        }
+
+        .log-form input {
+            display: block;
+            margin: auto auto;
+            width: 100%;
+            margin-bottom: 2em;
+            padding: .5em 0;
+            border: none;
+            border-bottom: 1px solid #eaeaea;
+            padding-bottom: 1.25em;
+            color: #757575;
+        }
+
+        .log-form input:focus {
+            outline: none;
+        }
+
+        .log-form .btn {
+            display: inline-block;
+            background: #1fb5bf;
+            border: 1px solid #1a9ea8;
+            padding: .5em 2em;
+            color: white;
+            margin-right: .5em;
+            box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.2);
+        }
+
+        .log-form .btn:hover {
+            background: #21c7cf;
+        }
+
+        .log-form .btn:active {
+            background: #1fb5bf;
+            box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        .log-form .btn:focus {
+            outline: none;
+        }
+
+        .log-form .forgot {
+            color: #28c7d0;
+            line-height: .5em;
+            position: relative;
+            top: 2.5em;
+            text-decoration: none;
+            font-size: .75em;
+            margin: 0;
+            padding: 0;
+            float: right;
+        }
+
+        .log-form .forgot:hover {
+            color: #259ea7;
+        }
+    </style>
+</head>
+<body>
+    <div class="log-form">
+        <h2>Login to your account</h2>
+        <form method="POST">{% csrf_token%}
+            <input type="text" name="email" placeholder="email" />
+            <input type="text" name="username" placeholder="username" />
+            <input type="password" name="password" placeholder="password" />
+            <button type="submit" class="btn">Login</button>
+            <a class="forgot" href="#">Forgot Username?</a>
+        </form>
+    </div>
+</body>
+</html>

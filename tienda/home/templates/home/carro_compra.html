@@ -1,0 +1,140 @@
+{% extends 'base/barra.html' %}
+
+{% block titulo%}
+Carrito
+{% endblock %}
+
+{% block contenido %}
+
+{% if messages %}
+    <div class="container my-1">
+        {% for message in messages %}
+            <div class="alert alert-danger">
+                {{ message.message|safe }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+
+
+<div class="container-fluid p-2 fondoContenido">
+    <div class="container">
+        <div class="row">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4 bg-white order-md-2 py-3">
+                        <div class="w-100 bg-white mt-5 ">
+                            <div class="p-1" style="background-color: rgb(240, 240, 240);">
+                                <p class="textoCartaContenido2 fw-bold ms-2">Total: ${{monto}}</p>
+                            </div>
+                            <div class="bg-white border-top border-1 p-2">
+                                {% if user.is_authenticated%}
+                                <button style="background-color: rgb(245, 151, 5);" onclick="window.location.href='{%url 'realizarCompra'%}'" class="btn w-100 text-white my-1" >Seguro</button>
+                                {% else %}
+                                <button style="background-color: rgb(245, 151, 5);" onclick="redirigirInicio()" class="btn w-100 text-white my-1" >Seguro</button>
+                                {% endif %}
+                                
+                                <div class="d-flex justify-content-between">
+                                    <button class="btn btn-secondary  me-1" >Continuar compra</button>
+                                    <button class="btn btn-secondary " onclick="window.location.href='{% url 'eliminarCarro'%}'" >Limpiar Carro</button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8 bg-white p-3 order-md-1">
+                        <h1>Carrito</h1>
+                        <div class="bg-primary w-100 p-3"></div>
+                        <p class="my-1 ms-2 textoCartaContenido2 fw-bold">{{cantidadProductos}} Productos - Monto {{monto}}</p>
+            
+                        <div class="d-flex bg-white w-100 p-2 border rounded-3 align-items-stretch mb-2">
+                            <img class="imgCarro" src="https://images.ygoprodeck.com/images/cards/1571945.jpg">
+                            <div class="ms-2">
+                                <p class="textoCartaContenido2 fw-bold">Ninja Grandmaster Sasuke - BP02-EN029 - Common 1st Edition</p>
+                                <p class="textoCartaContenido1">YuGiOh - Battle Pack 2: War of the Giants 1st Edition Singles</p>
+                                <p class="textoCartaContenido1">$0.89</p>
+                            </div>
+                            <div class="ms-auto d-none d-lg-flex align-items-center">
+                                <p class="m-5">hola</p>
+                                <p class="m-5">hola</p>
+                            </div>
+                        </div>
+            
+                        {% for producto in productos %}
+                        <div class="d-flex bg-white w-100 p-2 border rounded-3 align-items-stretch mb-2 position-relative">
+                            <img class="imgCarro" src="{{ MEDIA_URL }}{{ producto.carta.imagen.url }}">
+                            <div class="ms-2">
+                                <p class="textoCartaContenido2 fw-bold">{{ producto.carta.carta.nombre }} - {{ producto.carta.rareza }}</p>
+                                <p class="textoCartaContenido1">{{ producto.carta.carta.juego }} - {{ producto.carta.caja.nombre }}</p>
+                                <p class="textoCartaContenido1">${{ producto.carta.precio }}</p>
+                            </div>
+                            <div class="ms-auto d-none d-lg-flex align-items-center">
+                                <select style="font-size:14px; margin-top: -2px;" class="me-2" id="{{idCarro}}" name="cantidad" data-id="{{producto.idCarro}}">
+                                    {% for num in producto.cantidad_lista %}
+                                        <option value="{{ num }}" {% if num == producto.cantidad %}selected{% endif %}>{{ num }}</option>
+                                    {% endfor %}
+                                </select>
+                                <p class="mx-5 mb-0" style="font-size: 16px;">${{ producto.total }}</p>
+                            </div>
+                            
+                            <button class="btn btn-danger btn-sm position-absolute rounded-circle" style="top: -5px; right: -8px; width: 30px; height: 30px;" onclick="window.location.href='{% url 'eliminarProductoCarro' id=producto.idCarro %}'">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            
+                            
+                            
+                        </div>                        
+                        {% endfor %}
+                        <div class="bg-primary w-100 p-3"></div>
+                    </div>
+                </div>
+            </div>
+            
+    
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Selecciona todos los elementos <select> que tienen el atributo name="cantidad"
+    document.querySelectorAll('select[name="cantidad"]').forEach(function(select) {
+        // Agrega un listener para el evento 'change' a cada uno de esos elementos
+        select.addEventListener('change', function() {
+            // Llama a la función modificarCantidadCarro cuando el valor del select cambie
+            modificarCantidadCarro(this);
+        });
+    });
+});
+
+// Función que maneja el cambio de cantidad
+function modificarCantidadCarro(selectElement) {
+    var idCarro = selectElement.getAttribute('data-id');
+    var cantidad = selectElement.value;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', `/modificarCantidadCarro/${idCarro}/${cantidad}/`, true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            var response = JSON.parse(xhr.responseText);
+            console.log(response.message);
+
+            if (response.status === 'success' && response.redirect) {
+                window.location.href = response.redirect; // Redirecciona al usuario
+            }
+            // Manejar otros estados si es necesario
+        }
+    };
+    xhr.send();
+}
+
+function redirigirInicio(){
+    if(confirm('Debes haber iniciado sesión. ¿Deseas hacerlo?')){
+        window.location.href = "{% url 'login' %}";
+    }
+}
+
+
+</script>
+{% endblock %}

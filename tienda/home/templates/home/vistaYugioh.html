@@ -1,0 +1,63 @@
+{% extends 'base/filtros.html'%}
+{% block titulo%}
+Yu-Gi-Oh!
+{% endblock %}
+
+{% block busqueda %}
+<div class="col-md-9">
+    <div class="row  p-2">
+
+    {% if cartas %}
+        {% for producto in cartas %}
+        <div class="col-md-6 col-sm-12 p-3">
+            <div class="d-flex bg-white border rounded-3 p-3 divContenido">
+                <div class="me-3">
+                    <!--<a href="https://www.youtube.com/watch?v=LjTwCvt0DkA">-->
+                    <img class="imgCartaContenido" src="{{ MEDIA_URL }}{{ producto.imagen.url }}">
+                    <!--</a>-->
+                </div>
+                <div class="d-flex flex-column">
+                    <div>
+                        <p class="textoCartaContenido1">{{producto.carta.juego}}</p>
+                        <p class="textoCartaContenido1">{{producto.caja.nombre}}</p>
+                        <p class="textoCartaContenido1">{{producto.rareza}}, #DABL-EN016</p>
+                        <p class="fw-bold text-dark textoCartaContenido2">{{producto.carta.nombre}}</p>
+                        <p class="fw-bold text-dark textoCartaContenido2">{{producto.carta.id}}</p>
+                    </div>
+                    <div class="mt-2">
+                        {% if producto.has_stock%}<div class="bg-dark text-white rounded-3 d-inline-block p-1 textoCartaContenido1">No Stock</div>{% endif %}
+                        {% if producto.caja.preventa %}<div class="bg-info text-white rounded-3 d-inline-block p-1 textoCartaContenido1">Pre-venta</div>{%endif%}
+                    </div>
+                    <div class="mt-2 d-flex align-items-center">
+                        <div class="me-2">
+                            <p class="fw-bold text-dark textoCartaContenido3 mb-0">Precio:</p>
+                            <p class="text-success fw-bold textoCartaContenido3 mb-0">${{producto.precio}}</p>
+                        </div>
+                        <select class="me-2" id="cantidad-{{producto.carta.id}}{{producto.caja.id}}{{producto.carta.juego}}" name="cantidad" data-carta="{{producto.carta.id}}" data-caja="{{producto.caja.id}}" data-rareza="{{producto.carta.rareza}}" data-tcg="{{producto.carta.tcg}}" style="font-size: 15px;">
+                            {% for num in producto.cantidad_lista %}
+                                <option value="{{ num }}">{{ num }}</option>
+                            {% endfor %}
+                        </select>
+                        <a href="#" class="btn btn-success btn-compra" data-carta="{{ producto.carta.id }}" data-caja="{{producto.caja.id}}" data-rareza="{{producto.rareza}}" data-tcg="{{producto.carta.juego}}" onclick="agregarAlCarrito(event, this)">
+                            <i class="fas fa-shopping-cart"></i>
+                        </a>
+
+                    </div>                    
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12 p-3">
+            <div class="d-flex bg-white border rounded-3 p-3 justify-content-center">
+                <p class="text-dark fw-bold textoCartaContenido1">No hay resultados para "{{buscar}}"</p>
+            </div>
+        </div>
+    {% endif %}
+        
+    <div id="mensaje-carrito">
+        
+    </div>
+
+</div>
+{% endblock %}
